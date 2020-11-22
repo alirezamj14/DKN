@@ -14,10 +14,10 @@ def CNN(Myloss,Myactivation,data):
 
     # Model / data parameters
     num_classes = 10
-    input_shape = (32, 32, 3)
+    input_shape = (28, 28, 1)
 
     # the data, split between train and test sets
-    (x_train, y_train), (x_test, y_test) = keras.datasets.cifar10.load_data()
+    (x_train, y_train), (x_test, y_test) = keras.datasets.mnist.load_data()
 
     # Scale images to the [0, 1] range
     x_train = x_train.astype("float32") / 255
@@ -49,10 +49,6 @@ def CNN(Myloss,Myactivation,data):
 
 
     model = Model(inputs=inputs, outputs=outputs)
-
-    output_layer_features = model.get_layer("output_layer").input
-    model2 = Model(inputs=inputs, outputs=output_layer_features)
-
     model.summary()
     # print(Myactivation)
 
@@ -67,25 +63,3 @@ def CNN(Myloss,Myactivation,data):
     score = model.evaluate(x_test, y_test, verbose=0)
     print("Test loss:", score[0])
     print("Test accuracy:", score[1])
-
-
-    W = model.get_layer("output_layer").kernel
-    b = model.get_layer("output_layer").bias
-    b = tf.expand_dims(b, 0)
-    O = tf.concat([W , b], 0)
-    O = tf.transpose(O)
-
-    Feature_train = model2.predict(x_train)
-    Feature_test = model2.predict(x_test)
-
-    output_dic["Feat_train"]=tf.transpose(Feature_train)
-    output_dic["Feat_test"]=tf.transpose(Feature_test)
-    output_dic["T_train"]=tf.transpose(y_train)
-    output_dic["T_test"]=tf.transpose(y_test)
-    output_dic["O"]=O.numpy() 
-
-    architecture_name = "weights_CNN_"+Myloss+"_"+Myactivation
-    save_dic(output_dic, parameters_path, data, architecture_name)
-
-
-
