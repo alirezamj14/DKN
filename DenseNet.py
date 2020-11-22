@@ -4,14 +4,12 @@ import tensorflow as tf
 from tensorflow.keras import layers
 from tensorflow.keras.models import Model, Sequential
 from tensorflow.keras.layers import Input, UpSampling2D, Flatten, BatchNormalization, Dense, Dropout, GlobalAveragePooling2D
-from MyFunctions import *
 
 Myactivation='softmax'
 Myloss='categorical_crossentropy'
 
 parameters_path = "./parameters/"
 data = 'mnist'
-output_dic = {}
 
 # Model / data parameters
 p = 0.01
@@ -43,9 +41,6 @@ for i in np.arange(10):
 # Scale images to the [0, 1] range
 x_train = x_train.astype("float32") / 255
 x_test = x_test.astype("float32") / 255
-# Make sure images have shape (28, 28, 1)
-# x_train = np.expand_dims(x_train, -1)
-# x_test = np.expand_dims(x_test, -1)
 print("x_train shape:", x_train.shape)
 print(x_train.shape[0], "train samples")
 print(x_test.shape[0], "test samples")
@@ -59,6 +54,7 @@ def prepare_data_for_resnet50(data):
 x_train = prepare_data_for_resnet50(x_train)
 x_test = prepare_data_for_resnet50(x_test)
 
+# DenseNet input must be at least 32 x 32
 x_train = tf.keras.layers.ZeroPadding2D(padding=2)(x_train)
 x_test = tf.keras.layers.ZeroPadding2D(padding=2)(x_test)
 
@@ -80,11 +76,7 @@ model = keras.Model(inputs, outputs)
 
 
 model.summary()
-# print(Myactivation)
 
-
-
-# model.compile(loss="categorical_crossentropy", optimizer="adam", metrics=["accuracy"])
 model.compile(loss=Myloss, optimizer="adam", metrics=["accuracy"])
 
 model.fit(x_train, y_train, batch_size=batch_size, epochs=epochs, validation_split=0.1)

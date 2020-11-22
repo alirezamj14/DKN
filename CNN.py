@@ -4,14 +4,12 @@ import tensorflow as tf
 from tensorflow.keras import layers
 from tensorflow.keras.models import Model, Sequential
 from tensorflow.keras.layers import Input, UpSampling2D, Flatten, BatchNormalization, Dense, Dropout, GlobalAveragePooling2D
-from MyFunctions import *
 
 Myactivation='softmax'
 Myloss='categorical_crossentropy'
 
 parameters_path = "./parameters/"
 data = 'mnist'
-output_dic = {}
 
 # Model / data parameters
 p = 0.01
