@@ -15,11 +15,11 @@ output_dic = {}
 
 # Model / data parameters
 p = 0.01
-K_shots = 5
+K_shots = 1
 num_classes = 10
-batch_size = 128
+batch_size = 16
 epochs = 15
-input_shape = (28, 28, 1)
+input_shape = (28, 28, 3)
 
 # the data, split between train and test sets
 (X_train, Y_train), (x_test, y_test) = keras.datasets.mnist.load_data()
@@ -51,24 +51,28 @@ print("x_train shape:", x_train.shape)
 print(x_train.shape[0], "train samples")
 print(x_test.shape[0], "test samples")
 
+def prepare_data_for_resnet50(data):
+    # data = data_to_transform.copy().values
+    data = data.reshape(-1, 28, 28) / 255
+    data = np.stack([data, data, data], axis=-1)
+    return data
+
+x_train = prepare_data_for_resnet50(x_train)
+x_test = prepare_data_for_resnet50(x_test)
+
 # convert class vectors to binary class matrices
 y_train = keras.utils.to_categorical(y_train, num_classes)
 y_test = keras.utils.to_categorical(y_test, num_classes)
 
+base_model = tf.keras.applications.ResNet50(include_top=False)
+# base_model.summary()
 inputs = keras.Input(shape=input_shape)
-h = layers.Conv2D(32, kernel_size=(3, 3), activation="relu")(inputs)
-h = layers.Conv2D(32, kernel_size=(3, 3), activation="relu")(h)
-h = layers.MaxPooling2D(pool_size=(2, 2))(h)
-h = layers.Dropout(0.25)(h)
-h = layers.Conv2D(64, kernel_size=(3, 3), activation="relu")(h)
-h = layers.Conv2D(32, kernel_size=(3, 3), activation="relu")(h)
-h = layers.MaxPooling2D(pool_size=(2, 2))(h)
-h = layers.Dropout(0.25)(h)
-h = layers.Flatten()(h)
-h = layers.Dense(512, activation="relu")(h)
-h = layers.Dropout(0.5)(h)
-outputs = layers.Dense(num_classes, activation=Myactivation, name="output_layer")(h)
-model = Model(inputs=inputs, outputs=outputs)
+x = base_model(inputs, training=True)
+x = keras.layers.GlobalAveragePooling2D()(x)
+x = keras.layers.Dropout(0.2)(x)
+x = keras.layers.BatchNormalization()(x)
+outputs = keras.layers.Dense(num_classes, activation="softmax", name="output_layer2")(x)
+model = keras.Model(inputs, outputs)
 
 
 model.summary()
