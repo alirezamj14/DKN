@@ -12,16 +12,16 @@ parameters_path = "./parameters/"
 
 
 # Model / data parameters
-niter = 10
+niter = 1
 p = 0.01
-K_shots = 100
+K_shots = 50
 num_classes = 10
 batch_size = 128
 epochs = 15
 
 test_accuracy = np.empty([1, niter])
 
-data = 'cifar10'
+data = 'mnist'
 
 if data=='mnist':
     input_shape = (28, 28, 1)
@@ -53,6 +53,7 @@ model.summary()
 
 
 for iter in np.arange(niter):
+    tf.keras.backend.clear_session()
     model = Model(inputs=inputs, outputs=outputs)
     if data=='mnist':
         (X_train, Y_train), (x_test, y_test) = keras.datasets.mnist.load_data()
@@ -68,7 +69,7 @@ for iter in np.arange(niter):
         class_ind = np.array(class_ind)
         class_ind.flatten()
         np.random.shuffle( class_ind )
-        x_train[ i*K_shots:(i+1)*K_shots] = X_train[ class_ind[0,:K_shots]]
+        x_train[ i*K_shots:(i+1)*K_shots ] = X_train[ class_ind[0,:K_shots] ]
         y_train[ i*K_shots:(i+1)*K_shots ] = Y_train[ class_ind[0,:K_shots] ]
 
 
@@ -78,7 +79,7 @@ for iter in np.arange(niter):
     # Make sure images have shape (28, 28, 1)
     # x_train = np.expand_dims(x_train, -1)
     # x_test = np.expand_dims(x_test, -1)
-    # print("x_train shape:", x_train.shape)
+    print("x_train shape:", x_train.shape)
     # print(x_train.shape[0], "train samples")
     # print(x_test.shape[0], "test samples")
 

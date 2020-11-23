@@ -12,7 +12,7 @@ parameters_path = "./parameters/"
 
 niter = 10
 p = 0.01
-K_shots = 100
+K_shots = 5
 num_classes = 10
 batch_size = 128
 epochs = 15

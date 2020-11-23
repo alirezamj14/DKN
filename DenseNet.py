@@ -12,14 +12,14 @@ parameters_path = "./parameters/"
 
 niter = 10
 p = 0.01
-K_shots = 100
+K_shots = 25
 num_classes = 10
 batch_size = 128
 epochs = 15
 
 test_accuracy = np.empty([1, niter])
 
-data = 'cifar10'
+data = 'mnist'
 
 if data=='mnist':
     input_shape = (32, 32, 3)
@@ -41,6 +41,7 @@ model.summary()
 
 
 for iter in np.arange(niter):
+    
     model = Model(inputs=inputs, outputs=outputs)
     if data=='mnist':
         (X_train, Y_train), (x_test, y_test) = keras.datasets.mnist.load_data()
