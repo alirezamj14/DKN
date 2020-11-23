@@ -9,7 +9,7 @@ Myactivation='softmax'
 Myloss='categorical_crossentropy'
 
 parameters_path = "./parameters/"
-data = 'mnist'
+
 
 # Model / data parameters
 p = 0.01
@@ -17,10 +17,35 @@ K_shots = 5
 num_classes = 10
 batch_size = 128
 epochs = 15
+
+data = 'mnist'
 input_shape = (28, 28, 1)
+# input_shape = (32, 32, 3)
+
+inputs = keras.Input(shape=input_shape)
+h = layers.Conv2D(32, kernel_size=(3, 3), activation="relu")(inputs)
+h = layers.Conv2D(32, kernel_size=(3, 3), activation="relu")(h)
+h = layers.MaxPooling2D(pool_size=(2, 2))(h)
+h = layers.Dropout(0.25)(h)
+h = layers.Conv2D(64, kernel_size=(3, 3), activation="relu")(h)
+h = layers.Conv2D(32, kernel_size=(3, 3), activation="relu")(h)
+h = layers.MaxPooling2D(pool_size=(2, 2))(h)
+h = layers.Dropout(0.25)(h)
+h = layers.Flatten()(h)
+h = layers.Dense(512, activation="relu")(h)
+h = layers.Dropout(0.5)(h)
+outputs = layers.Dense(num_classes, activation=Myactivation, name="output_layer")(h)
+model = Model(inputs=inputs, outputs=outputs)
+model.summary()
+
 
 # the data, split between train and test sets
-(X_train, Y_train), (x_test, y_test) = keras.datasets.mnist.load_data()
+if data=='mnist':
+    (X_train, Y_train), (x_test, y_test) = keras.datasets.mnist.load_data()
+    input_shape = (28, 28, 1)
+elif data=='cifar10':
+    (X_train, Y_train), (x_test, y_test) = keras.datasets.cifar10.load_data()
+    input_shape = (32, 32, 3)
 
 # x_train = np.empty([K_shots*num_classes ,28, 28],  dtype='uint8')
 # y_train = np.empty([K_shots*num_classes],  dtype='uint8')
@@ -53,26 +78,8 @@ print(x_test.shape[0], "test samples")
 y_train = keras.utils.to_categorical(y_train, num_classes)
 y_test = keras.utils.to_categorical(y_test, num_classes)
 
-inputs = keras.Input(shape=input_shape)
-h = layers.Conv2D(32, kernel_size=(3, 3), activation="relu")(inputs)
-h = layers.Conv2D(32, kernel_size=(3, 3), activation="relu")(h)
-h = layers.MaxPooling2D(pool_size=(2, 2))(h)
-h = layers.Dropout(0.25)(h)
-h = layers.Conv2D(64, kernel_size=(3, 3), activation="relu")(h)
-h = layers.Conv2D(32, kernel_size=(3, 3), activation="relu")(h)
-h = layers.MaxPooling2D(pool_size=(2, 2))(h)
-h = layers.Dropout(0.25)(h)
-h = layers.Flatten()(h)
-h = layers.Dense(512, activation="relu")(h)
-h = layers.Dropout(0.5)(h)
-outputs = layers.Dense(num_classes, activation=Myactivation, name="output_layer")(h)
-model = Model(inputs=inputs, outputs=outputs)
 
-
-model.summary()
 # print(Myactivation)
-
-
 
 # model.compile(loss="categorical_crossentropy", optimizer="adam", metrics=["accuracy"])
 model.compile(loss=Myloss, optimizer="adam", metrics=["accuracy"])
